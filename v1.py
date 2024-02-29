@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, messagebox, Menu
+from tkinter import PhotoImage ,scrolledtext, messagebox, Menu
 import threading
 import socket
 import rsa
@@ -8,20 +8,29 @@ import json
 
 # Initialize RSA keys
 (public_key, private_key) = rsa.newkeys(2048) 
-public_partner = None
 
-# Server and Client socket
+# Server and Client socket setup
 server = None
 client = None
 connected_client_socket = None  
+
 # Setup GUI
 root = tk.Tk()
 root.title("Secure Chat Application")
+root.geometry('360x640')  # fixed size
+root.resizable(False, False)  # Disable resizing
 root.configure(bg='#ADD8E6')
 
 # Constants
 SERVER_PORT = 9999
 BUFFER_SIZE = 1024
+
+# GUI Elements Styling
+BUTTON_BG = "#00BFFF"
+BUTTON_FG = "white"
+MESSAGE_BOX_BG = "#F0FFFF"  # background color for message display box
+TITLE_BG = "#ADD8E6"
+TITLE_FG = "#00008B"
 
 # GUI responsiveness
 for i in range(5):
@@ -58,7 +67,7 @@ def display_message(msg):
     message_display.configure(state='disabled')
     message_display.see(tk.END)
 
-# Function to receive messages 
+# Function to receive messages and update GUI
 def receive_message(conn):
     global private_key, public_partner
     while True:
@@ -149,8 +158,8 @@ def exit_application():
         client.close()
     root.quit()
 
-#add a label
-app_name_label = tk.Label(root, text="Secure Chat", font=("Helvetica", 16), bg='#ADD8E6')
+# Add a styled label for the app name
+app_name_label = tk.Label(root, text="Secure Chat", font=("Helvetica", 16, "bold"), bg='#FF0000', fg='#FFFFFF')
 app_name_label.grid(row=0, column=0, columnspan=5, pady=10)
 
 # Add menu
@@ -166,24 +175,33 @@ menu_bar.add_cascade(label="Help", menu=help_menu)
 help_menu.add_command(label="About", command=display_about)
 help_menu.add_command(label="Help", command=display_help)
 
-# GUI Elements
-ip_label = tk.Label(root, text="IP Address:", bg='#ADD8E6')
-ip_label.grid(row=0, column=0, sticky=tk.EW)
-ip_entry = tk.Entry(root)
-ip_entry.grid(row=0, column=1, sticky=tk.EW, columnspan=4)
+# GUI Elements with updated styling and custom size
+ip_label = tk.Label(root, text="IP Address:", bg='#40FA04')
+ip_label.grid(row=1, column=0, pady=5, sticky=tk.E)
 
-message_display = scrolledtext.ScrolledText(root, state='disabled', bg='white')
-message_display.grid(row=1, column=0, sticky=tk.NSEW, columnspan=5)
+ip_entry = tk.Entry(root, width=15)
+ip_entry.grid(row=1, column=1, columnspan=2, pady=5)
 
-message_entry = tk.Entry(root)
-message_entry.grid(row=2, column=0, sticky=tk.EW, columnspan=4)
+host_button = tk.Button(root, text="Host Chat", command=host_chat, bg='#FE6000', fg=BUTTON_FG)
+host_button.grid(row=1, column=3, pady=5)
+
+join_button = tk.Button(root, text="Join Chat", command=join_chat, bg='#FE6000', fg=BUTTON_FG)
+join_button.grid(row=1, column=4, pady=5)
+
+# Custom size for message display
+message_display = scrolledtext.ScrolledText(root, height=15, width=50, )  # Adjust height as needed
+message_display.grid(row=2, column=0, columnspan=5, pady=5)
+message_display.configure(state='disabled')
+
+message_label = tk.Label(root, text="Message:", bg='#40FA04')
+message_label.grid(row=3, column=0, pady=5, sticky=tk.E)
+
+message_entry = tk.Entry(root, width=35,)
+message_entry.grid(row=3, column=1, columnspan=3, pady=5)
 message_entry.bind("<Return>", send_message)
 
-host_button = tk.Button(root, text="Host Chat", command=host_chat)
-host_button.grid(row=3, column=0, sticky=tk.EW)
-join_button = tk.Button(root, text="Join Chat", command=join_chat)
-join_button.grid(row=3, column=1, sticky=tk.EW)
-send_button = tk.Button(root, text="Send", command=send_message)
-send_button.grid(row=3, column=4, sticky=tk.EW)
+send_button = tk.Button(root, text="Send", command=send_message, bg='#FA0000', fg=BUTTON_FG)
+send_button.grid(row=3, column=4, pady=5)
 
+# Starting GUI event loop
 root.mainloop()
